@@ -7,21 +7,12 @@ from flink_api.sql_gateway.session import SqlGatewaySession
 class SqlGatewayHelper:
     @staticmethod
     def sequential_execute_many(
-        session: SqlGatewaySession, sql_list: List[str]
+            session: SqlGatewaySession, sql_list: List[str]
     ) -> SqlGatewayOperation:
         operation = None
         for sql in sql_list:
             operation = SqlGatewayOperation.execute_statement_wait_finish(session, sql)
         return operation
-
-    # @staticmethod
-    # def execute_sql_with_pipeline_name(session: SqlGatewaySession, sql, pipe_name):
-    #     sql_list = [
-    #         f"set 'pipeline.name'='{pipe_name}'",
-    #         sql,
-    #         f"reset 'pipeline.name'"
-    #     ]
-    #     return SqlGatewayHelper.sequential_execute_many(session=session, sql_list=sql_list)
 
     @staticmethod
     def get_settings(session: SqlGatewaySession):

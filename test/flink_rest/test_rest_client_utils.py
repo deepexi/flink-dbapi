@@ -476,6 +476,193 @@ job_detail_response_2 = """
 	}
 }"""
 
+job_detail_response_3 = """
+{
+	"jid": "b265be7e8a8b6ee08c8d9f168ee6e2b5",
+	"name": "insert-into_cat2.cat2_db2.t2_mirror",
+	"isStoppable": false,
+	"state": "RUNNING",
+	"start-time": 1680862396159,
+	"end-time": -1,
+	"duration": 27210,
+	"maxParallelism": -1,
+	"now": 1680862423369,
+	"timestamps": {
+		"FAILING": 0,
+		"CREATED": 1680862396261,
+		"FINISHED": 0,
+		"RECONCILING": 0,
+		"INITIALIZING": 1680862396159,
+		"CANCELLING": 0,
+		"RUNNING": 1680862396532,
+		"CANCELED": 0,
+		"SUSPENDED": 0,
+		"FAILED": 0,
+		"RESTARTING": 0
+	},
+	"vertices": [{
+			"id": "bc764cd8ddf7a0cff126f51c16239658",
+			"name": "Source: Iceberg table (cat2.cat2_db2.t2) monitor",
+			"maxParallelism": 128,
+			"parallelism": 1,
+			"status": "RUNNING",
+			"start-time": 1680862396751,
+			"end-time": -1,
+			"duration": 26618,
+			"tasks": {
+				"CANCELED": 0,
+				"FAILED": 0,
+				"INITIALIZING": 0,
+				"CANCELING": 0,
+				"CREATED": 0,
+				"DEPLOYING": 0,
+				"SCHEDULED": 0,
+				"RUNNING": 1,
+				"FINISHED": 0,
+				"RECONCILING": 0
+			},
+			"metrics": {
+				"read-bytes": 0,
+				"read-bytes-complete": true,
+				"write-bytes": 1044,
+				"write-bytes-complete": true,
+				"read-records": 0,
+				"read-records-complete": true,
+				"write-records": 1,
+				"write-records-complete": true,
+				"accumulated-backpressured-time": 0,
+				"accumulated-idle-time": 0,
+				"accumulated-busy-time": "NaN"
+			}
+		},
+		{
+			"id": "20ba6b65f97481d5570070de90e4e791",
+			"name": "t2[1] -> IcebergStreamWriter",
+			"maxParallelism": 128,
+			"parallelism": 1,
+			"status": "RUNNING",
+			"start-time": 1680862396762,
+			"end-time": -1,
+			"duration": 26607,
+			"tasks": {
+				"CANCELED": 0,
+				"FAILED": 0,
+				"INITIALIZING": 0,
+				"CANCELING": 0,
+				"CREATED": 0,
+				"DEPLOYING": 0,
+				"SCHEDULED": 0,
+				"RUNNING": 1,
+				"FINISHED": 0,
+				"RECONCILING": 0
+			},
+			"metrics": {
+				"read-bytes": 1086,
+				"read-bytes-complete": true,
+				"write-bytes": 715,
+				"write-bytes-complete": true,
+				"read-records": 1,
+				"read-records-complete": true,
+				"write-records": 1,
+				"write-records-complete": true,
+				"accumulated-backpressured-time": 0,
+				"accumulated-idle-time": 12620,
+				"accumulated-busy-time": 660
+			}
+		},
+		{
+			"id": "b5c8d46f3e7b141acf271f12622e752b",
+			"name": "IcebergFilesCommitter -> Sink: IcebergSink cat2.cat2_db2.t2_mirror",
+			"maxParallelism": 1,
+			"parallelism": 1,
+			"status": "RUNNING",
+			"start-time": 1680862396774,
+			"end-time": -1,
+			"duration": 26595,
+			"tasks": {
+				"CANCELED": 0,
+				"FAILED": 0,
+				"INITIALIZING": 0,
+				"CANCELING": 0,
+				"CREATED": 0,
+				"DEPLOYING": 0,
+				"SCHEDULED": 0,
+				"RUNNING": 1,
+				"FINISHED": 0,
+				"RECONCILING": 0
+			},
+			"metrics": {
+				"read-bytes": 757,
+				"read-bytes-complete": true,
+				"write-bytes": 0,
+				"write-bytes-complete": true,
+				"read-records": 1,
+				"read-records-complete": true,
+				"write-records": 0,
+				"write-records-complete": true,
+				"accumulated-backpressured-time": 0,
+				"accumulated-idle-time": 12943,
+				"accumulated-busy-time": 448
+			}
+		}
+	],
+	"status-counts": {
+		"CANCELED": 0,
+		"FAILED": 0,
+		"INITIALIZING": 0,
+		"CANCELING": 0,
+		"CREATED": 0,
+		"DEPLOYING": 0,
+		"SCHEDULED": 0,
+		"RUNNING": 3,
+		"FINISHED": 0,
+		"RECONCILING": 0
+	},
+	"plan": {
+		"jid": "b265be7e8a8b6ee08c8d9f168ee6e2b5",
+		"name": "insert-into_cat2.cat2_db2.t2_mirror",
+		"type": "STREAMING",
+		"nodes": [{
+				"id": "b5c8d46f3e7b141acf271f12622e752b",
+				"parallelism": 1,
+				"operator": "",
+				"operator_strategy": "",
+				"description": "IcebergFilesCommitter<br/>+- Sink: IcebergSink cat2.cat2_db2.t2_mirror<br/>",
+				"inputs": [{
+					"num": 0,
+					"id": "20ba6b65f97481d5570070de90e4e791",
+					"ship_strategy": "FORWARD",
+					"exchange": "pipelined_bounded"
+				}],
+				"optimizer_properties": {}
+			},
+			{
+				"id": "20ba6b65f97481d5570070de90e4e791",
+				"parallelism": 1,
+				"operator": "",
+				"operator_strategy": "",
+				"description": "[1]:TableSourceScan(table=[[cat2, cat2_db2, t2]], fields=[id, age], hints=[[[OPTIONS options:{streaming=true, monitor-interval=1s}]]])<br/>+- IcebergStreamWriter<br/>",
+				"inputs": [{
+					"num": 0,
+					"id": "bc764cd8ddf7a0cff126f51c16239658",
+					"ship_strategy": "FORWARD",
+					"exchange": "pipelined_bounded"
+				}],
+				"optimizer_properties": {}
+			},
+			{
+				"id": "bc764cd8ddf7a0cff126f51c16239658",
+				"parallelism": 1,
+				"operator": "",
+				"operator_strategy": "",
+				"description": "Source: Iceberg table (cat2.cat2_db2.t2) monitor<br/>",
+				"optimizer_properties": {}
+			}
+		]
+	}
+}
+"""
+
 
 class TestRestClientUtils(unittest.TestCase):
     def test_parse_job_detail(self):
@@ -485,9 +672,7 @@ class TestRestClientUtils(unittest.TestCase):
         self.assertEquals(job_detail_1.plan_type, "STREAMING")
         self.assertEquals(len(job_detail_1.plan_nodes), 2)
         self.assertEquals(job_detail_1.plan_nodes[0].plan_node_status, "RUNNING")
-        self.assertEquals(
-            job_detail_1.plan_nodes[0].relation, Relation("cat1", "cat1_db1", "topic01")
-        )
+        self.assertEquals(job_detail_1.plan_nodes[0].relation, Relation("cat1", "cat1_db1", "topic01"))
         self.assertEquals(job_detail_1.plan_nodes[1].plan_node_status, "FINISHED")
         self.assertEquals(job_detail_1.plan_nodes[1].relation, Relation("cat2", "cat2_db2", "t2"))
 
@@ -496,3 +681,12 @@ class TestRestClientUtils(unittest.TestCase):
         self.assertEquals(job_detail_2.state, "FINISHED")
         self.assertEquals(job_detail_2.plan_type, "BATCH")
         self.assertEquals(len(job_detail_2.plan_nodes), 2)
+
+    def test_parse_job_detail_2(self):
+        job_detail_3 = RestClientUtils.parse_job_detail(json.loads(job_detail_response_3))
+        self.assertEquals(job_detail_3.state, "RUNNING")
+        self.assertEquals(job_detail_3.plan_type, "STREAMING")
+        self.assertEquals(len(job_detail_3.plan_nodes), 1)
+        self.assertEquals(job_detail_3.plan_nodes[0].plan_node_status, "RUNNING")
+        self.assertEquals(job_detail_3.plan_nodes[0].relation, Relation("cat2", "cat2_db2", "t2"))
+        pass

@@ -21,7 +21,7 @@ class TestFlinkSqlTypeHelper(unittest.TestCase):
     def test_sql_pre_process(self):
         _sql = " {} select * from aa {} *///***"
         sql = _sql.format("/* __dbt_'pipeline.name'='foo' */", "/* should_be_removed */")
-        self.assertEquals(_sql.format("", "").strip(), FlinkSqlParseHelper.sql_pre_process(sql))
+        self.assertEquals(_sql.format("", "").strip(), FlinkSqlParseHelper._sql_pre_process(sql))
 
     def test_extract_dbt_hint(self):
         # _sql = " {} "

@@ -83,6 +83,11 @@ class FlinkOperation:
             return False
 
         job_detail: FlinkJobDetail = self.flink_rest_client.job_detail(jobs[0].jid)
+
+        # this job has a node hint: streaming=true
+        if job_detail.node_has_hint_streaming():
+            return True
+
         scan_tables: List[Relation] = job_detail.list_running_table_source_scan_node()
         # check if one of these scan_table is streaming table
         # by `show create table xxx.xxx.xxx`

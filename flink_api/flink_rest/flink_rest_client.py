@@ -9,14 +9,6 @@ from flink_api.flink_rest.rest_client_utils import RestClientUtils
 
 _SCHEMA_HTTP = "http"
 _SLEEP_INTERVAL_S = 0.1
-# @dataclass
-# class FlinkRestClientConfig:
-#     host: str
-#     port: int
-#
-#     @staticmethod
-#     def _test_config():
-#         return FlinkRestClientConfig("localhost", 8081)
 
 JOB_STATUS = [
     "INITIALIZING",
@@ -45,7 +37,7 @@ class FlinkRestClient:
         if response.status_code != 200:
             raise Exception("flink api error: ", response.status_code)
         jobs = response.json()["jobs"]
-        return [FlinkJob(j["jid"], j["name"], j["state"]) for j in jobs]
+        return [FlinkJob(j["jid"], j["name"], j["state"], j["start-time"]) for j in jobs]
 
     def job_detail(self, job_id):
         url = f"{_SCHEMA_HTTP}://{self.host_port}/jobs/{job_id}"
@@ -76,8 +68,8 @@ class FlinkRestClient:
                 self.cancel_job_by_id(j.jid)
 
     def wait_job_complete(
-        self,
-        name: str,
+            self,
+            name: str,
     ):
         while True:
             all_name_jobs = self.get_job_by_name(name)

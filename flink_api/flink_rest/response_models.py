@@ -26,14 +26,22 @@ class Relation:
 @dataclass
 class PlanNode:
     """
-    description: "[12]:TableSourceScan(table=[[cat2, cat2_db2, t2, project=[id]]], fields=[id])<br/>"
+    description:
+    "[12]:TableSourceScan(table=[[cat2, cat2_db2, t2, project=[id]]], fields=[id])<br/>"
+    [1]:TableSourceScan(table=[[cat2, cat2_db2, t2]], fields=[id, age], hints=[[[OPTIONS options:{streaming=true, monitor-interval=1s}]]])<br/>+- IcebergStreamWriter<br/>
     """
 
     id: str
     description: str
-    is_table_source_scan: bool
+    # is_table_source_scan: bool # always True
+    flink_hints: dict
     relation: Relation
     plan_node_status: str
+
+    def is_hint_streaming(self):
+        if self.flink_hints:
+            return self.flink_hints.get("streaming") == "true"
+        return False
 
 
 @dataclass
@@ -41,11 +49,13 @@ class FlinkJob:
     jid: str
     name: str
     state: str
+    start_time: int
 
-    def __init__(self, jid, name, state):
+    def __init__(self, jid, name, state, start_time):
         self.jid = jid
         self.name = name
         self.state = state
+        self.start_time = start_time
 
     def _is_running(self):
         return self.state == "RUNNING"
@@ -67,21 +77,26 @@ class FlinkJob:
 
 @dataclass
 class FlinkJobDetail(FlinkJob):
-    # plan_nodes only keep "TableSourceScan" node
-    plan_nodes: List[PlanNode]
+    plan_nodes: List[PlanNode]  # plan_nodes only keep "TableSourceScan" node
     plan_type: str
 
-    def __init__(self, jid, name, state, plan_nodes, plan_type):
-        FlinkJob.__init__(self, jid, name, state)
+    def __init__(self, jid, name, state, start_time, plan_nodes, plan_type):
+        FlinkJob.__init__(self, jid, name, state, start_time)
         self.plan_nodes = plan_nodes
         self.plan_type = plan_type
 
     def list_running_table_source_scan_node(self) -> List[Relation]:
         running_table_src_scan = []
         for _node in self.plan_nodes:
-            if _node.is_table_source_scan and _node.plan_node_status == "RUNNING":
+            if _node.plan_node_status == "RUNNING":
                 running_table_src_scan.append(_node.relation)
         return running_table_src_scan
+
+    def node_has_hint_streaming(self):
+        for node in self.plan_nodes:
+            if node.is_hint_streaming():
+                return True
+        return False
 
 
 class ParsePolicy:

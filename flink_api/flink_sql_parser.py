@@ -52,7 +52,7 @@ class FlinkSqlParseHelper:
         return sql_type in NO_JOB_REQUIRED
 
     @staticmethod
-    def sql_pre_process(sql_raw, remove_comment=True):
+    def _sql_pre_process(sql_raw, remove_comment=True):
         # remove \n \r
         sql = sql_raw.replace("\n", " ").strip().lower()
 
@@ -64,12 +64,15 @@ class FlinkSqlParseHelper:
                     print(f"sql={sql}")
                 else:
                     break
+
+        # backtick replace to '
+        sql = sql.replace('`', '\'')
         return sql.strip()
 
     @staticmethod
     def sql_type_verdict(sql_raw: str):
         """check sql type"""
-        sql = FlinkSqlParseHelper.sql_pre_process(sql_raw)
+        sql = FlinkSqlParseHelper._sql_pre_process(sql_raw)
 
         if sql.startswith("set"):
             return FLINK_SQL_TYPE_SET
@@ -114,7 +117,7 @@ class FlinkSqlParseHelper:
                 _hints[key_value[0]] = key_value[1]
 
         #
-        sql = FlinkSqlParseHelper.sql_pre_process(sql_raw, remove_comment=False)
+        sql = FlinkSqlParseHelper._sql_pre_process(sql_raw, remove_comment=False)
         hints = {}
         while match := re.search(re_dbt_hint, sql):
             if match[3]:
