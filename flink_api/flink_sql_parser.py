@@ -66,7 +66,7 @@ class FlinkSqlParseHelper:
                     break
 
         # backtick replace to '
-        sql = sql.replace('`', '\'')
+        sql = sql.replace("`", "'")
         return sql.strip()
 
     @staticmethod

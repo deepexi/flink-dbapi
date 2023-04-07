@@ -672,7 +672,9 @@ class TestRestClientUtils(unittest.TestCase):
         self.assertEquals(job_detail_1.plan_type, "STREAMING")
         self.assertEquals(len(job_detail_1.plan_nodes), 2)
         self.assertEquals(job_detail_1.plan_nodes[0].plan_node_status, "RUNNING")
-        self.assertEquals(job_detail_1.plan_nodes[0].relation, Relation("cat1", "cat1_db1", "topic01"))
+        self.assertEquals(
+            job_detail_1.plan_nodes[0].relation, Relation("cat1", "cat1_db1", "topic01")
+        )
         self.assertEquals(job_detail_1.plan_nodes[1].plan_node_status, "FINISHED")
         self.assertEquals(job_detail_1.plan_nodes[1].relation, Relation("cat2", "cat2_db2", "t2"))
 

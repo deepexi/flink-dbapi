@@ -68,8 +68,8 @@ class FlinkRestClient:
                 self.cancel_job_by_id(j.jid)
 
     def wait_job_complete(
-            self,
-            name: str,
+        self,
+        name: str,
     ):
         while True:
             all_name_jobs = self.get_job_by_name(name)

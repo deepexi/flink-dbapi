@@ -11,7 +11,7 @@ class FlinkUtils:
     def _sql_pre_process(sql_raw):
         sql = sql_raw.replace("\n", " ").strip().lower()
         # backtick replace to '
-        sql = sql.replace('`', '\'')
+        sql = sql.replace("`", "'")
         return sql.strip()
 
     @staticmethod

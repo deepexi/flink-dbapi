@@ -7,7 +7,7 @@ from flink_api.sql_gateway.session import SqlGatewaySession
 class SqlGatewayHelper:
     @staticmethod
     def sequential_execute_many(
-            session: SqlGatewaySession, sql_list: List[str]
+        session: SqlGatewaySession, sql_list: List[str]
     ) -> SqlGatewayOperation:
         operation = None
         for sql in sql_list:

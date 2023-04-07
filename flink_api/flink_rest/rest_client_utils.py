@@ -27,7 +27,9 @@ class RestClientUtils:
                 continue
 
             flink_hint = {}
-            re_flink_hints = re.compile(r"(.*?)TableSourceScan\((.*)hints=\[\[\[OPTIONS\s+options:\{(.*?)\}]]](.*)\)")
+            re_flink_hints = re.compile(
+                r"(.*?)TableSourceScan\((.*)hints=\[\[\[OPTIONS\s+options:\{(.*?)\}]]](.*)\)"
+            )
             match_flink_hints = re.search(re_flink_hints, description)
             if match_flink_hints:
                 hints_str = match_flink_hints[3]
@@ -41,4 +43,6 @@ class RestClientUtils:
             plan_node_status = list(filter(lambda v: v["id"] == jid, j["vertices"]))[0]["status"]
             plan_nodes.append(PlanNode(jid, description, flink_hint, relation, plan_node_status))
 
-        return FlinkJobDetail(j["jid"], j["name"], j["state"], j["start-time"], plan_nodes, plan["type"])
+        return FlinkJobDetail(
+            j["jid"], j["name"], j["state"], j["start-time"], plan_nodes, plan["type"]
+        )
