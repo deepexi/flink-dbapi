@@ -2,10 +2,10 @@ import requests
 
 
 def find_album_by_id(_id: int):
-    url = f'https://jsonplaceholder.typicode.com/albums/{_id}'
+    url = f"https://jsonplaceholder.typicode.com/albums/{_id}"
     _resp = requests.get(url)
     if _resp.status_code == 200:
-        return _resp.json()['title']
+        return _resp.json()["title"]
     else:
         return None
 

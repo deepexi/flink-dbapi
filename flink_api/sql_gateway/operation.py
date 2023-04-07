@@ -44,25 +44,24 @@ class SqlGatewayOperation:
         self.column_names = None
         self.data_rows: List[Any] = []
 
-    # @staticmethod
-    # def execute_statement(session, sql: str) -> 'SqlGatewayOperation':
-    #     op = SqlGatewayOperation(session, sql)
-    #     op.start()
-    #     return op
+    @staticmethod
+    def execute_many(session: SqlGatewaySession, sql_list: List[str]) -> "SqlGatewayOperation":
+        operation = None
+        for sql in sql_list:
+            operation = SqlGatewayOperation.execute_statement_wait_finish(session, sql)
+        return operation
 
     @staticmethod
-    def execute_statement_wait_finish(session, sql: str) -> 'SqlGatewayOperation':
+    def execute_statement_wait_finish(session, sql: str) -> "SqlGatewayOperation":
         """execute statement and wait finish
-        here finish means:
-        1. done or
-        2. accepted by flink cluster
+        here finish means: accepted by flink cluster
         """
         op = SqlGatewayOperation(session, sql)
         op.start()
         op._wait_submit_finished()
         return op
 
-    def start(self):
+    def start(self) -> None:
         logger.info(f"execute {self.sql}")
         response = requests.post(
             url=f"{self.session.session_endpoint()}/statements",
@@ -82,14 +81,13 @@ class SqlGatewayOperation:
             return "CLOSED"
 
         response = requests.get(
-            url=f"{self.statement_endpoint()}/status",
-            headers={"Content-Type": "application/json"}
+            url=f"{self.statement_endpoint()}/status", headers={"Content-Type": "application/json"}
         )
         if response.status_code != 200:
             raise Exception("SQL gateway error: ", response.status_code)
         return response.json()["status"]
 
-    def _wait_submit_finished(self):
+    def _wait_submit_finished(self) -> None:
         status = self.get_status()
         # FINISHED = submitted to flink successfully, not job has been done
         # so streaming job also FINISHED soon
@@ -107,7 +105,9 @@ class SqlGatewayOperation:
         """
         response = requests.post(
             url=f"{self.statement_endpoint()}/cancel",
-            headers={"Content-Type": "application/json", },
+            headers={
+                "Content-Type": "application/json",
+            },
         )
         if response.status_code != 200:
             raise Exception("SQL gateway error: ", response.status_code)
@@ -125,7 +125,7 @@ class SqlGatewayOperation:
             self.closed = True
         return status
 
-    def has_next(self):
+    def has_next(self) -> bool:
         return (self.last_payload is None) or (self.last_payload.has_next())
 
     def fetch_next_result(self) -> List[Any]:
@@ -151,7 +151,7 @@ class SqlGatewayOperation:
         self.last_payload = payload
         return rows
 
-    def fetch_all_result(self):
+    def fetch_all_result(self) -> List[Any]:
         while self.has_next():
             self.fetch_next_result()
         return self.data_rows

@@ -3,8 +3,12 @@ import unittest
 from flink_api.dbapi import Connection
 from flink_api.flink_operation import FlinkConfig, FlinkOperation
 from flink_api.sql_gateway.session import SqlGatewaySession
-from test.sql_gateway.test_sql import sql_create_catalog_cat1, sql_create_cat1_db1, sql_drop_cat1_db1_topic01, \
-    sql_create_cat1_db1_topic01
+from test.sql_gateway.test_sql import (
+    sql_create_catalog_cat1,
+    sql_create_cat1_db1,
+    sql_drop_cat1_db1_topic01,
+    sql_create_cat1_db1_topic01,
+)
 
 
 def _test_config():
@@ -23,11 +27,12 @@ def _setup():
 
 
 class TestDbapi(unittest.TestCase):
-
     def test_execute(self):
         conf: FlinkConfig = _test_config()
 
-        conn = Connection(conf.flink_api_host_port, conf.sql_gw_api_host_port, conf.sql_gw_session_handle)
+        conn = Connection(
+            conf.flink_api_host_port, conf.sql_gw_api_host_port, conf.sql_gw_session_handle
+        )
         cursor = conn.cursor()
         cursor.execute("select 9981 as f1, 9982 as f1")
         result_set = cursor.fetchall()

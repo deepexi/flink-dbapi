@@ -72,12 +72,14 @@ class Cursor:
 
 class Connection(object):
     def __init__(
-            self,
-            flink_rest_api_host_port: str,
-            flink_sql_gw_host_port: str,
-            flink_sql_gw_session_handle: str,
+        self,
+        flink_rest_api_host_port: str,
+        flink_sql_gw_host_port: str,
+        flink_sql_gw_session_handle: str,
     ):
-        config = FlinkConfig(flink_rest_api_host_port, flink_sql_gw_host_port, flink_sql_gw_session_handle)
+        config = FlinkConfig(
+            flink_rest_api_host_port, flink_sql_gw_host_port, flink_sql_gw_session_handle
+        )
         self.flink_operation = FlinkOperation(config)
 
     def close(self):

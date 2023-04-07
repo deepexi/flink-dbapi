@@ -19,5 +19,5 @@ class SqlGatewaySession:
     @staticmethod
     def _test_session(host_port: str = "127.0.0.1:8083"):
         r = requests.post(f"{_SCHEMA_HTTP}://{host_port}/v1/sessions", '{"sessionName" : "hehe"}')
-        session_handle = r.json()['sessionHandle']
+        session_handle = r.json()["sessionHandle"]
         return SqlGatewaySession(host_port, session_handle)

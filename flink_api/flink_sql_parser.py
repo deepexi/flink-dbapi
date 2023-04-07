@@ -42,14 +42,10 @@ NO_JOB_REQUIRED = [
 
 logger = get_logger("FlinkSqlParseHelper")
 
-SUPPORT_DBT_HINT_KEY = [
-    "pipeline.name"
-    "execution.runtime-mode"
-]
+SUPPORT_DBT_HINT_KEY = ["pipeline.name" "execution.runtime-mode"]
 
 
 class FlinkSqlParseHelper:
-
     @staticmethod
     def sql_without_flink_job(sql):
         sql_type = FlinkSqlParseHelper.sql_type_verdict(sql)
@@ -113,8 +109,8 @@ class FlinkSqlParseHelper:
     @staticmethod
     def extract_dbt_hint(sql_raw: str) -> dict:
         def _process_hint_kv(multi_kv: str, _hints: dict):
-            for kv in multi_kv.strip().split(' '):
-                key_value = kv.strip().split('=')
+            for kv in multi_kv.strip().split(" "):
+                key_value = kv.strip().split("=")
                 _hints[key_value[0]] = key_value[1]
 
         #

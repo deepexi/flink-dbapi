@@ -9,9 +9,7 @@ with open("flink-sql-gateway-client") as f:
     version = version.group(1)
 
 all_require = []
-tests_require = all_require + [
-
-]
+tests_require = all_require + []
 
 setuptools.setup(
     name="py_flink_sql_gateway_client",
