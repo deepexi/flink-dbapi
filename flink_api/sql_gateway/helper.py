@@ -11,12 +11,12 @@ class SqlGatewayHelper:
     ) -> SqlGatewayOperation:
         operation = None
         for sql in sql_list:
-            operation = SqlGatewayOperation.execute_statement_wait_finish(session, sql)
+            operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, sql)
         return operation
 
     @staticmethod
     def get_settings(session: SqlGatewaySession):
-        operation = SqlGatewayOperation.execute_statement_wait_finish(session, "set")
+        operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, "set")
         operation.fetch_all_result()
         settings = {}
         for kv in operation.data_rows:

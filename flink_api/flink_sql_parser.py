@@ -15,8 +15,10 @@ re_create_db = re.compile(r"create\s+database\s+(\w+)")
 re_create_catalog = re.compile(r"create\s+catalog\s+(\w+)")
 re_create_table = re.compile(r"create[\s\n\r]+table")
 re_create_view = re.compile(r"create[\s\n\r]+view")
+re_ctas = re.compile(r"create\s+table\s+[\w\\.]*\s+as.*")
 
 FLINK_SQL_TYPE_UNKNOWN = "FLINK_SQL_TYPE_UNKNOWN"
+# these sql will NOT involve flink job
 FLINK_SQL_TYPE_SET = "FLINK_SQL_TYPE_SET"
 FLINK_SQL_TYPE_USE = "FLINK_SQL_TYPE_USE"
 FLINK_SQL_TYPE_SHOW = "FLINK_SQL_TYPE_SHOW"
@@ -26,18 +28,21 @@ FLINK_SQL_TYPE_CREATE_CATALOG = "FLINK_SQL_TYPE_CREATE_CATALOG"
 FLINK_SQL_TYPE_CREATE_DATABASE = "FLINK_SQL_TYPE_CREATE_DATABASE"
 FLINK_SQL_TYPE_CREATE_VIEW = "FLINK_SQL_TYPE_CREATE_VIEW"
 FLINK_SQL_TYPE_CREATE_TABLE = "FLINK_SQL_TYPE_CREATE_TABLE"
-# FLINK_SQL_TYPE_CTAS = "FLINK_SQL_TYPE_CTAS"
+# these sql will involve flink job
+FLINK_SQL_TYPE_CTAS = "FLINK_SQL_TYPE_CTAS"
 FLINK_SQL_TYPE_SELECT = "FLINK_SQL_TYPE_SELECT"
 FLINK_SQL_TYPE_INSERT = "FLINK_SQL_TYPE_INSERT"
 
-NO_JOB_REQUIRED = [
+_NO_JOB_REQUIRED = [
     FLINK_SQL_TYPE_SET,
     FLINK_SQL_TYPE_USE,
     FLINK_SQL_TYPE_SHOW,
+    FLINK_SQL_TYPE_DESCRIBE,
     FLINK_SQL_TYPE_DROP,
     FLINK_SQL_TYPE_CREATE_CATALOG,
     FLINK_SQL_TYPE_CREATE_DATABASE,
     FLINK_SQL_TYPE_CREATE_VIEW,
+    FLINK_SQL_TYPE_CREATE_TABLE,
 ]
 
 logger = get_logger("FlinkSqlParseHelper")
@@ -47,9 +52,11 @@ SUPPORT_DBT_HINT_KEY = ["pipeline.name" "execution.runtime-mode"]
 
 class FlinkSqlParseHelper:
     @staticmethod
-    def sql_without_flink_job(sql):
+    def is_sql_require_flink_job(sql) -> bool:
         sql_type = FlinkSqlParseHelper.sql_type_verdict(sql)
-        return sql_type in NO_JOB_REQUIRED
+        if sql == FLINK_SQL_TYPE_UNKNOWN:
+            raise Exception(f"TODO some sql cannot recognized: {sql}")
+        return sql_type not in _NO_JOB_REQUIRED
 
     @staticmethod
     def _sql_pre_process(sql_raw, remove_comment=True):
@@ -65,8 +72,9 @@ class FlinkSqlParseHelper:
                 else:
                     break
 
-        # backtick replace to '
-        sql = sql.replace("`", "'")
+        # backtick `
+        # sql = sql.replace("`", "'")
+        sql = sql.replace("`", "")
         return sql.strip()
 
     @staticmethod
@@ -93,7 +101,10 @@ class FlinkSqlParseHelper:
             parsed_sql = sqlglot.parse_one(sql)
             if parsed_sql.key == "create":
                 if re.search(re_create_table, sql):
-                    return FLINK_SQL_TYPE_CREATE_TABLE
+                    if re.search(re_ctas, sql):
+                        return FLINK_SQL_TYPE_CTAS
+                    else:
+                        return FLINK_SQL_TYPE_CREATE_TABLE
                 elif re.search(re_create_view, sql):
                     return FLINK_SQL_TYPE_CREATE_VIEW
                 else:

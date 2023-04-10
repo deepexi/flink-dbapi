@@ -3,7 +3,7 @@ import unittest
 from flink_api.dbapi import Connection
 from flink_api.flink_operation import FlinkConfig, FlinkOperation
 from flink_api.sql_gateway.session import SqlGatewaySession
-from test.sql_gateway.test_sql import (
+from test.res_sql_in_cat1 import (
     sql_create_catalog_cat1,
     sql_create_cat1_db1,
     sql_drop_cat1_db1_topic01,

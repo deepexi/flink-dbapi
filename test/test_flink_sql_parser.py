@@ -14,6 +14,7 @@ from flink_api.flink_sql_parser import (
     FLINK_SQL_TYPE_DESCRIBE,
     FLINK_SQL_TYPE_INSERT,
     FLINK_SQL_TYPE_UNKNOWN,
+    FLINK_SQL_TYPE_CTAS,
 )
 
 
@@ -92,33 +93,13 @@ class TestFlinkSqlTypeHelper(unittest.TestCase):
             FLINK_SQL_TYPE_CREATE_DATABASE,
             FlinkSqlParseHelper.sql_type_verdict("create database db1"),
         )
-        #
-        # self.assertEquals(FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict(""))
 
-    def test_sql_type_verdict_create_table(self):
+    def test_sql_type_verdict_unknown(self):
         sql_list = [
-            "create table t1 (c1 int, c2 timestamp)",
-            "create table t1 as select * from t2",
-            "create table t1 as select c1, c2 from t2",
-            "with foo as (select * from bar) create table t1 as select * from t2",
-            "with foo as (select * from bar), ggg as (select * from hhh) create table t1 as select * from t2",
+            "this is not a sql",
         ]
         for sql in sql_list:
-            self.assertEquals(
-                FLINK_SQL_TYPE_CREATE_TABLE, FlinkSqlParseHelper.sql_type_verdict(sql)
-            )
-
-    def test_sql_type_verdict_create_view(self):
-        sql_list = [
-            "create view t1 as select * from t2",
-            "create view t1 as select c1, c2 from t2",
-            "with foo as (select * from bar) create view t1 as select * from t2",
-            "with foo as (select * from bar), ggg as (select * from hhh) create view v1 as select * from v2",
-        ]
-        for sql in sql_list:
-            self.assertEquals(
-                FLINK_SQL_TYPE_CREATE_VIEW, FlinkSqlParseHelper.sql_type_verdict(sql)
-            )
+            self.assertEquals(FLINK_SQL_TYPE_UNKNOWN, FlinkSqlParseHelper.sql_type_verdict(sql))
 
     def test_sql_type_verdict_select(self):
         sql_list = [
@@ -139,9 +120,38 @@ class TestFlinkSqlTypeHelper(unittest.TestCase):
         for sql in sql_list:
             self.assertEquals(FLINK_SQL_TYPE_INSERT, FlinkSqlParseHelper.sql_type_verdict(sql))
 
-    def test_sql_type_verdict_unknown(self):
+    def test_sql_type_verdict_verdict_ctas(self):
         sql_list = [
-            "this is not a sql",
+            "create table t1 as select * from t2",
+            "create table `t1` as select * from t2",
+            "create table t1 as select c1, c2 from t2",
+            "with foo as (select * from bar) create table `a`.`b`.`t1` as select * from t2",
+            "with foo as (select * from bar) create table a.b.t1 as select * from t2",
+            "with foo as (select * from bar), ggg as (select * from hhh) create table t1 as select * from t2",
+            "with foo as (select * from bar), ggg as (select * from hhh) create table `t1` as select * from t2",
+            "with foo as (select * from bar), ggg as (select * from hhh) create table a.b.t1 as select * from t2",
+            "with foo as (select * from bar), ggg as (select * from hhh) create table `a`.`b`.`t1` as select * from t2",
         ]
         for sql in sql_list:
-            self.assertEquals(FLINK_SQL_TYPE_UNKNOWN, FlinkSqlParseHelper.sql_type_verdict(sql))
+            self.assertEquals(FLINK_SQL_TYPE_CTAS, FlinkSqlParseHelper.sql_type_verdict(sql))
+
+    def test_sql_type_verdict_verdict_create_table(self):
+        sql_list = [
+            "create table t1 (c1 int, c2 timestamp)",
+        ]
+        for sql in sql_list:
+            self.assertEquals(
+                FLINK_SQL_TYPE_CREATE_TABLE, FlinkSqlParseHelper.sql_type_verdict(sql)
+            )
+
+    def test_sql_type_verdict_verdict_create_view(self):
+        sql_list = [
+            "create view t1 as select * from t2",
+            "create view t1 as select c1, c2 from t2",
+            "with foo as (select * from bar) create view t1 as select * from t2",
+            "with foo as (select * from bar), ggg as (select * from hhh) create view v1 as select * from v2",
+        ]
+        for sql in sql_list:
+            self.assertEquals(
+                FLINK_SQL_TYPE_CREATE_VIEW, FlinkSqlParseHelper.sql_type_verdict(sql)
+            )

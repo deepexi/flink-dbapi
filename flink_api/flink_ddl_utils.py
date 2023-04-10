@@ -6,7 +6,7 @@ import sqlglot
 FLINK_STREAMING_CONNECTOR_LIST = []
 
 
-class FlinkUtils:
+class FlinkDdlUtils:
     @staticmethod
     def _sql_pre_process(sql_raw):
         sql = sql_raw.replace("\n", " ").strip().lower()
@@ -17,7 +17,7 @@ class FlinkUtils:
     @staticmethod
     def is_table_streaming_by_ddl(sql_ddl: str) -> bool:
         """check a table is a streaming src or not"""
-        sql = FlinkUtils._sql_pre_process(sql_ddl)
+        sql = FlinkDdlUtils._sql_pre_process(sql_ddl)
         parsed_sql = sqlglot.parse_one(sql)
         args = parsed_sql.args
         if not args:  # this table has not with properties
@@ -29,11 +29,11 @@ class FlinkUtils:
             return False
 
         _properties = properties.args["expressions"]
-        kv_pair = FlinkUtils.properties_to_dic(_properties)
+        kv_pair = FlinkDdlUtils.properties_to_dic(_properties)
 
         # case: has connector
         if kv_pair.get("connector"):  # no connector
-            return FlinkUtils.is_connector_stream_src(kv_pair)
+            return FlinkDdlUtils.is_connector_stream_src(kv_pair)
 
         # no connector
         return False
@@ -56,10 +56,10 @@ class FlinkUtils:
     def is_connector_stream_src(kv_pair) -> bool:
         connector = kv_pair.get("connector")
         if connector == "kafka":
-            return not FlinkUtils._is_kafka_bounded(connector, kv_pair)
+            return not FlinkDdlUtils._is_kafka_bounded(connector, kv_pair)
         if connector == "filesystem":
             return False
-        raise f"TODO connector={connector} not recognized, should refine this method"
+        raise Exception(f"TODO connector={connector} not recognized, should refine this method")
 
     @staticmethod
     def _is_kafka_bounded(connector, kv_pair) -> bool:

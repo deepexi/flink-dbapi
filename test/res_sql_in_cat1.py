@@ -2,17 +2,6 @@ sql_create_catalog_cat1 = """
 CREATE CATALOG cat1 WITH ('type'='hive', 'hive-conf-dir'='/opt/flink/conf')
 """.strip()
 
-sql_create_catalog_cat2 = """
-CREATE CATALOG cat2 WITH (
-  'type'='iceberg',
-  'catalog-type'='hive',
-  'uri'='thrift://hms.dormi.io:9083',
-  'clients'='5',
-  'property-version'='1',
-  'warehouse'='s3a://warehouse/'
-);
-"""
-
 sql_create_cat1_db1 = """
 create database if not exists cat1.cat1_db1
 """.strip()

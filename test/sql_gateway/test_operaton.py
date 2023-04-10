@@ -7,7 +7,7 @@ from flink_api.flink_rest.flink_rest_client import FlinkRestClient, FlinkJob
 from flink_api.sql_gateway.helper import SqlGatewayHelper
 from flink_api.sql_gateway.operation import SqlGatewayOperation
 from flink_api.sql_gateway.session import SqlGatewaySession
-from test.sql_gateway.test_sql import (
+from test.res_sql_in_cat1 import (
     sql_create_catalog_cat1,
     sql_create_cat1_db1,
     sql_create_cat1_db1_topic01,
@@ -27,7 +27,7 @@ class TestSqlGatewayOperation(unittest.TestCase):
     def test_execute_statement(self):
         session = SqlGatewaySession._test_session()
         sql = "select 9981 as id"
-        operation = SqlGatewayOperation.execute_statement_wait_finish(session, sql)
+        operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, sql)
         rows: List[Any] = operation.fetch_next_result()  # may not contain data
         self.assertEquals(operation.last_payload.result_type, "PAYLOAD")
 
@@ -39,7 +39,7 @@ class TestSqlGatewayOperation(unittest.TestCase):
 
     def test_get_settings(self):
         session = SqlGatewaySession._test_session()
-        SqlGatewayOperation.execute_statement_wait_finish(
+        SqlGatewayOperation.submit_sql_and_wait_submit_finished(
             session, "set 'execution.runtime-mode' = 'streaming'"
         )
         settings = SqlGatewayHelper.get_settings(session)
@@ -60,7 +60,7 @@ class TestSqlGatewayOperation(unittest.TestCase):
             ],
         )
         time.sleep(3)  # manual wait insert job finished
-        last_operation = SqlGatewayOperation.execute_statement_wait_finish(
+        last_operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(
             session, sql_select_cat1_db1_table01
         )
         result = last_operation.fetch_all_result()
@@ -87,7 +87,7 @@ class TestSqlGatewayOperation(unittest.TestCase):
                 f"set 'pipeline.name'='{job_name}'",
             ],
         )
-        select_op1 = SqlGatewayOperation.execute_statement_wait_finish(
+        select_op1 = SqlGatewayOperation.submit_sql_and_wait_submit_finished(
             session, sql_select_cat1_db1_topic01
         )
         while select_op1.has_next():

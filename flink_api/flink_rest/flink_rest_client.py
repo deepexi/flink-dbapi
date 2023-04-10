@@ -1,6 +1,6 @@
 import time
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 import requests
 
@@ -55,14 +55,24 @@ class FlinkRestClient:
 
     def _is_job_streaming(self, job_id):
         """cannot implement"""
-        raise "TODO: don't know how to implement it here"
+        raise Exception("TODO: don't know how to implement it here")
 
-    def get_job_by_name(self, name: str) -> List[FlinkJob]:
+    def list_job_by_name(self, name: str) -> List[FlinkJob]:
         jobs = self.job_list()
         return list(filter(lambda job: (job.name == name), jobs))
 
+    def get_latest_start_job_by_name(self, name: str) -> Optional[FlinkJob]:
+        jobs = self.list_job_by_name(name)
+        if len(jobs) == 0:
+            return None
+        latest_start_job = jobs[0]
+        for i in range(1, len(jobs)):
+            if jobs[i].start_time > latest_start_job.start_time:
+                latest_start_job = jobs[i]
+        return latest_start_job
+
     def cancel_job_by_name_if_possible(self, name: str):
-        jobs = self.get_job_by_name(name)
+        jobs = self.list_job_by_name(name)
         for j in jobs:
             if j.is_not_finished():
                 self.cancel_job_by_id(j.jid)
@@ -72,8 +82,14 @@ class FlinkRestClient:
         name: str,
     ):
         while True:
-            all_name_jobs = self.get_job_by_name(name)
-            not_end_jobs = list(filter(lambda job: job.is_not_finished(), all_name_jobs))
-            if len(not_end_jobs) == 0:
+            job = self.get_latest_start_job_by_name(name)
+            if job is not None and job.is_finished():
+                return
+            time.sleep(_SLEEP_INTERVAL_S)
+
+    def wait_job_running(self, name: str):
+        while True:
+            job = self.get_latest_start_job_by_name(name)
+            if (job is not None) and (job.is_running()):
                 return
             time.sleep(_SLEEP_INTERVAL_S)

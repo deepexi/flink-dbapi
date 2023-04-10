@@ -1,6 +1,6 @@
 import unittest
 
-from flink_api.flink_utils import FlinkUtils
+from flink_api.flink_ddl_utils import FlinkDdlUtils
 
 ddl_stream_1 = """
 CREATE TABLE `cat1`.`cat1_db1`.`topic01` (
@@ -55,13 +55,13 @@ CREATE TABLE `cat1`.`cat1_db1`.`table01` (
 
 class TestFlinkUtils(unittest.TestCase):
     def test_is_table_streaming_by_ddl_1(self):
-        self.assertTrue(FlinkUtils.is_table_streaming_by_ddl(ddl_stream_1))
+        self.assertTrue(FlinkDdlUtils.is_table_streaming_by_ddl(ddl_stream_1))
 
     def test_is_table_streaming_by_ddl_2(self):
-        self.assertFalse(FlinkUtils.is_table_streaming_by_ddl(ddl_bound_1))
+        self.assertFalse(FlinkDdlUtils.is_table_streaming_by_ddl(ddl_bound_1))
 
     def test_is_table_streaming_by_ddl_3(self):
-        self.assertFalse(FlinkUtils.is_table_streaming_by_ddl(ddl_bound_2))
+        self.assertFalse(FlinkDdlUtils.is_table_streaming_by_ddl(ddl_bound_2))
 
     def test_is_table_streaming_by_ddl_4(self):
-        self.assertFalse(FlinkUtils.is_table_streaming_by_ddl(ddl_bound_3))
+        self.assertFalse(FlinkDdlUtils.is_table_streaming_by_ddl(ddl_bound_3))

@@ -44,21 +44,31 @@ class SqlGatewayOperation:
         self.column_names = None
         self.data_rows: List[Any] = []
 
-    @staticmethod
-    def execute_many(session: SqlGatewaySession, sql_list: List[str]) -> "SqlGatewayOperation":
-        operation = None
-        for sql in sql_list:
-            operation = SqlGatewayOperation.execute_statement_wait_finish(session, sql)
-        return operation
+    # @staticmethod
+    # def submit_many_sql_one_by_one(session: SqlGatewaySession, sql_list: List[str]) -> "SqlGatewayOperation":
+    #     operation = None
+    #     for sql in sql_list:
+    #         operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, sql)
+    #     return operation
 
     @staticmethod
-    def execute_statement_wait_finish(session, sql: str) -> "SqlGatewayOperation":
+    def submit_sql_and_wait_submit_finished(
+        session: SqlGatewaySession, sql_or_list
+    ) -> "SqlGatewayOperation":
         """execute statement and wait finish
         here finish means: accepted by flink cluster
         """
-        op = SqlGatewayOperation(session, sql)
-        op.start()
-        op._wait_submit_finished()
+        sql_list = []
+        if isinstance(sql_or_list, list):
+            sql_list = sql_or_list
+        else:
+            sql_list.append(sql_or_list)
+
+        op = None
+        for sql in sql_list:
+            op = SqlGatewayOperation(session, sql)
+            op.start()
+            op._wait_submit_finished()
         return op
 
     def start(self) -> None:
@@ -134,7 +144,7 @@ class SqlGatewayOperation:
             _url = f"{self.statement_endpoint()}/result/0"
         else:
             if not self.last_payload.has_next():
-                raise f"operation {self.operation_handle} no more results"
+                raise Exception(f"operation {self.operation_handle} no more results")
             _url = f"{self.session.schema_host_port()}{self.last_payload.next_result_uri}"
 
         response = requests.get(

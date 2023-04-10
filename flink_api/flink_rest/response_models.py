@@ -57,7 +57,7 @@ class FlinkJob:
         self.state = state
         self.start_time = start_time
 
-    def _is_running(self):
+    def is_running(self):
         return self.state == "RUNNING"
 
     def can_cancel(self):
@@ -72,7 +72,10 @@ class FlinkJob:
         ]
 
     def is_not_finished(self):
-        return not (self.state in ["CANCELED", "FINISHED"])
+        return not (self.is_finished())
+
+    def is_finished(self):
+        return self.state in ["CANCELED", "FINISHED"]
 
 
 @dataclass
@@ -85,6 +88,9 @@ class FlinkJobDetail(FlinkJob):
         self.plan_nodes = plan_nodes
         self.plan_type = plan_type
 
+    def is_plan_type_batch(self):
+        return self.plan_type == "batch"
+
     def list_running_table_source_scan_node(self) -> List[Relation]:
         running_table_src_scan = []
         for _node in self.plan_nodes:
@@ -92,7 +98,7 @@ class FlinkJobDetail(FlinkJob):
                 running_table_src_scan.append(_node.relation)
         return running_table_src_scan
 
-    def node_has_hint_streaming(self):
+    def plan_node_has_hint_streaming(self):
         for node in self.plan_nodes:
             if node.is_hint_streaming():
                 return True
