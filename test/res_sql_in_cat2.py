@@ -19,7 +19,7 @@ sql_create_table_cat2_db2_t2 = """
 CREATE TABLE `cat2`.`cat2_db2`.`t2` (
   `id` INT,
   `age` INT
-); 
+);
 """
 
 sql_drop_table_cat2_db2_t2_mirror = """drop table if exists cat2.cat2_db2.t2_mirror"""

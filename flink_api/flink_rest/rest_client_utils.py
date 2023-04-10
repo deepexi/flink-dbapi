@@ -1,16 +1,14 @@
-import json
 import re
-from dataclasses import dataclass
-from typing import List
 
 from flink_api.flink_rest.response_models import PlanNode, FlinkJobDetail, Relation
 
 # [5]:TableSourceScan(table=[[cat1, cat1_db1, topic01]], fields=[id, name, ts])<br/>
-#     [1]:TableSourceScan(table=[[cat2, cat2_db2, t2]], fields=[id, age], hints=[[[OPTIONS options:{streaming=true, monitor-interval=1s}]]])<br/>+- IcebergStreamWriter<br/>
+# [1]:TableSourceScan(table=[[cat2, cat2_db2, t2]], fields=[id, age], hints=[[[OPTIONS options:{streaming=true, monitor-interval=1s}]]])<br/>+- IcebergStreamWriter<br/>
 re_table_source_scan = re.compile(r"(.*?)TableSourceScan\(table=\[\[(.*?)]](.*)\)")
 
-
-# re_flink_hints = re.compile(r"(.*?)TableSourceScan\((.*)hints=\[\[\[OPTIONS option:(.*?)]]](.*)\)")
+re_flink_hints = re.compile(
+    r"(.*?)TableSourceScan\((.*)hints=\[\[\[OPTIONS\s+options:\{(.*?)\}]]](.*)\)"
+)
 
 
 class RestClientUtils:
@@ -27,9 +25,6 @@ class RestClientUtils:
                 continue
 
             flink_hint = {}
-            re_flink_hints = re.compile(
-                r"(.*?)TableSourceScan\((.*)hints=\[\[\[OPTIONS\s+options:\{(.*?)\}]]](.*)\)"
-            )
             match_flink_hints = re.search(re_flink_hints, description)
             if match_flink_hints:
                 hints_str = match_flink_hints[3]

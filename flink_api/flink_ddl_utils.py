@@ -1,4 +1,3 @@
-import re
 from flink_api.log import get_logger
 
 import sqlglot

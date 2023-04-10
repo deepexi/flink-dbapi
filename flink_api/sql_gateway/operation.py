@@ -44,13 +44,6 @@ class SqlGatewayOperation:
         self.column_names = None
         self.data_rows: List[Any] = []
 
-    # @staticmethod
-    # def submit_many_sql_one_by_one(session: SqlGatewaySession, sql_list: List[str]) -> "SqlGatewayOperation":
-    #     operation = None
-    #     for sql in sql_list:
-    #         operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, sql)
-    #     return operation
-
     @staticmethod
     def submit_sql_and_wait_submit_finished(
         session: SqlGatewaySession, sql_or_list
@@ -100,7 +93,6 @@ class SqlGatewayOperation:
     def _wait_submit_finished(self) -> None:
         status = self.get_status()
         # FINISHED = submitted to flink successfully, not job has been done
-        # so streaming job also FINISHED soon
         while status != "FINISHED":
             if status == "ERROR":
                 raise Exception(f"execute statement status=ERROR, {self.sql} ")

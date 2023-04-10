@@ -14,7 +14,6 @@
 This module defines exceptions for flink operations. It follows the structure
 defined in pep-0249.
 """
-from typing import Any, Dict, Optional, Tuple
 
 from flink_api.log import get_logger
 
