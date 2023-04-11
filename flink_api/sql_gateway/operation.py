@@ -45,9 +45,7 @@ class SqlGatewayOperation:
         self.data_rows: List[Any] = []
 
     @staticmethod
-    def submit_sql_and_wait_submit_finished(
-        session: SqlGatewaySession, sql_or_list
-    ) -> "SqlGatewayOperation":
+    def submit_sql_and_wait_submit_finished(session: SqlGatewaySession, sql_or_list) -> "SqlGatewayOperation":
         """execute statement and wait finish
         here finish means: accepted by flink cluster
         """

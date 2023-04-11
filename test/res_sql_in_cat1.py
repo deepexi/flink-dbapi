@@ -24,6 +24,7 @@ CREATE TABLE cat1.cat1_db1.topic01 (
 """.strip()
 
 sql_insert_cat1_db1_topic01 = """
+/** 'job_name'='group1:sql_insert_cat1_db1_topic01' */
 insert into cat1.cat1_db1.topic01
 (id, name, ts)
 values
@@ -32,6 +33,8 @@ values
 """.strip()
 
 sql_select_cat1_db1_topic01 = """
+/** 'job_name'='group2:sql_select_cat1_db1_topic01'*/
+
 select * from cat1.cat1_db1.topic01
 """.strip()
 

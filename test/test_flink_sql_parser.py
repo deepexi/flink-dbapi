@@ -29,57 +29,35 @@ class TestFlinkSqlTypeHelper(unittest.TestCase):
         _sql = " {} select * from aa {} /* 'foo'='bar' */ {}"
         sql = _sql.format(
             "/** 'pipeline.name'='foo' */",
-            "/** 'key1'='value1' 'key2'='value2' */",
+            "/** 'key1'='value1' 'test' */",
             "/** 'key3'='value3' */",
         )
+        expect_hint = {"pipeline.name": "foo", "key1": "value1", "test": None, "key3": "value3"}
         hints = FlinkSqlParseHelper.extract_dbt_hint(sql)
         self.assertEquals(len(hints), 4)
+        self.assertEquals(hints, expect_hint)
 
     def test_sql_type_verdict_simple(self):
         self.assertEquals(FLINK_SQL_TYPE_SET, FlinkSqlParseHelper.sql_type_verdict("set xx=yy"))
         #
-        self.assertEquals(
-            FLINK_SQL_TYPE_USE, FlinkSqlParseHelper.sql_type_verdict(" use catalog cat1")
-        )
+        self.assertEquals(FLINK_SQL_TYPE_USE, FlinkSqlParseHelper.sql_type_verdict(" use catalog cat1"))
         self.assertEquals(FLINK_SQL_TYPE_USE, FlinkSqlParseHelper.sql_type_verdict("use db1 "))
-        self.assertEquals(
-            FLINK_SQL_TYPE_USE, FlinkSqlParseHelper.sql_type_verdict("use  cat1.db1")
-        )
+        self.assertEquals(FLINK_SQL_TYPE_USE, FlinkSqlParseHelper.sql_type_verdict("use  cat1.db1"))
         #
-        self.assertEquals(
-            FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show catalogs")
-        )
-        self.assertEquals(
-            FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show current catalog")
-        )
-        self.assertEquals(
-            FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show databases")
-        )
-        self.assertEquals(
-            FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show current database")
-        )
+        self.assertEquals(FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show catalogs"))
+        self.assertEquals(FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show current catalog"))
+        self.assertEquals(FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show databases"))
+        self.assertEquals(FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show current database"))
         self.assertEquals(FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show tables"))
         self.assertEquals(FLINK_SQL_TYPE_SHOW, FlinkSqlParseHelper.sql_type_verdict("show views"))
         #
-        self.assertEquals(
-            FLINK_SQL_TYPE_DESCRIBE, FlinkSqlParseHelper.sql_type_verdict("describe t1")
-        )
-        self.assertEquals(
-            FLINK_SQL_TYPE_DESCRIBE, FlinkSqlParseHelper.sql_type_verdict("describe db1.t1")
-        )
-        self.assertEquals(
-            FLINK_SQL_TYPE_DESCRIBE, FlinkSqlParseHelper.sql_type_verdict("describe c1.db1.t1")
-        )
+        self.assertEquals(FLINK_SQL_TYPE_DESCRIBE, FlinkSqlParseHelper.sql_type_verdict("describe t1"))
+        self.assertEquals(FLINK_SQL_TYPE_DESCRIBE, FlinkSqlParseHelper.sql_type_verdict("describe db1.t1"))
+        self.assertEquals(FLINK_SQL_TYPE_DESCRIBE, FlinkSqlParseHelper.sql_type_verdict("describe c1.db1.t1"))
         #
-        self.assertEquals(
-            FLINK_SQL_TYPE_DROP, FlinkSqlParseHelper.sql_type_verdict("drop table xxx cascade ")
-        )
-        self.assertEquals(
-            FLINK_SQL_TYPE_DROP, FlinkSqlParseHelper.sql_type_verdict("drop database xxx cascade ")
-        )
-        self.assertEquals(
-            FLINK_SQL_TYPE_DROP, FlinkSqlParseHelper.sql_type_verdict("drop catalog xxx cascade ")
-        )
+        self.assertEquals(FLINK_SQL_TYPE_DROP, FlinkSqlParseHelper.sql_type_verdict("drop table xxx cascade "))
+        self.assertEquals(FLINK_SQL_TYPE_DROP, FlinkSqlParseHelper.sql_type_verdict("drop database xxx cascade "))
+        self.assertEquals(FLINK_SQL_TYPE_DROP, FlinkSqlParseHelper.sql_type_verdict("drop catalog xxx cascade "))
         #
         self.assertEquals(
             FLINK_SQL_TYPE_CREATE_CATALOG,
@@ -140,9 +118,7 @@ class TestFlinkSqlTypeHelper(unittest.TestCase):
             "create table t1 (c1 int, c2 timestamp)",
         ]
         for sql in sql_list:
-            self.assertEquals(
-                FLINK_SQL_TYPE_CREATE_TABLE, FlinkSqlParseHelper.sql_type_verdict(sql)
-            )
+            self.assertEquals(FLINK_SQL_TYPE_CREATE_TABLE, FlinkSqlParseHelper.sql_type_verdict(sql))
 
     def test_sql_type_verdict_verdict_create_view(self):
         sql_list = [
@@ -152,6 +128,4 @@ class TestFlinkSqlTypeHelper(unittest.TestCase):
             "with foo as (select * from bar), ggg as (select * from hhh) create view v1 as select * from v2",
         ]
         for sql in sql_list:
-            self.assertEquals(
-                FLINK_SQL_TYPE_CREATE_VIEW, FlinkSqlParseHelper.sql_type_verdict(sql)
-            )
+            self.assertEquals(FLINK_SQL_TYPE_CREATE_VIEW, FlinkSqlParseHelper.sql_type_verdict(sql))

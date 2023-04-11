@@ -26,7 +26,7 @@ class Relation:
 @dataclass
 class PlanNode:
     """
-    description:
+    from description + metrics
     "[12]:TableSourceScan(table=[[cat2, cat2_db2, t2, project=[id]]], fields=[id])<br/>"
     [1]:TableSourceScan(table=[[cat2, cat2_db2, t2]], fields=[id, age], hints=[[[OPTIONS options:{streaming=true, monitor-interval=1s}]]])<br/>+- IcebergStreamWriter<br/>
     """
@@ -36,12 +36,19 @@ class PlanNode:
     # is_table_source_scan: bool # always True
     flink_hints: dict
     relation: Relation
-    plan_node_status: str
+    plan_node_status: str  # RUNNING | FINISHED | ...
+    # metrics
+    metrics_accumulated_backpressured_time: int
+    metrics_accumulated_busy_time: int
+    metrics_accumulated_idle_time: int
 
     def is_hint_streaming(self):
         if self.flink_hints:
             return self.flink_hints.get("streaming") == "true"
         return False
+
+    def is_node_finished(self):
+        return self.plan_node_status == "FINISHED"
 
 
 @dataclass

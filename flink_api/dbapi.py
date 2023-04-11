@@ -31,20 +31,20 @@ class Cursor:
     def close(self):
         pass
 
-    def execute(self, sql, params=None):
+    def execute(self, sql: str, params=None):
         if params:
-            raise NotSupportedError("currently execute not support params")
-        self.last_operation = self.flink_op.execute_dbt_hint_sql(sql)
+            raise NotSupportedError("TODO not support params")
+        self.last_operation = self.flink_op.execute_statement(sql)
         return self
 
-    def executemany(self, operation, seq_of_params):
+    def executemany(self, sql: str, seq_of_params):
         for parameters in seq_of_params[:-1]:
-            self.execute(operation, parameters)
+            self.execute(sql, parameters)
             self.fetchall()
         if seq_of_params:
-            self.last_operation = self.execute(operation, seq_of_params[-1])
+            self.last_operation = self.execute(sql, seq_of_params[-1])
         else:
-            self.last_operation = self.execute(operation)
+            self.last_operation = self.execute(sql)
         return self
 
     def fetchone(self) -> Optional[List[Any]]:
@@ -77,9 +77,7 @@ class Connection(object):
         flink_sql_gw_host_port: str,
         flink_sql_gw_session_handle: str,
     ):
-        config = FlinkConfig(
-            flink_rest_api_host_port, flink_sql_gw_host_port, flink_sql_gw_session_handle
-        )
+        config = FlinkConfig(flink_rest_api_host_port, flink_sql_gw_host_port, flink_sql_gw_session_handle)
         self.flink_operation = FlinkOperation(config)
 
     def close(self):

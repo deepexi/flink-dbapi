@@ -22,13 +22,13 @@ repos:
   hooks:
   - id: black
     args:
-    - "--line-length=99"
+    - "--line-length=119"
     - "--target-version=py38"
   - id: black
     alias: black-check
     stages: [manual]
     args:
-    - "--line-length=99"
+    - "--line-length=119"
     - "--target-version=py38"
     - "--check"
     - "--diff"

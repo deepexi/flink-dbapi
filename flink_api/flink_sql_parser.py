@@ -18,7 +18,7 @@ re_create_view = re.compile(r"create[\s\n\r]+view")
 re_ctas = re.compile(r"create\s+table\s+[\w\\.]*\s+as.*")
 
 FLINK_SQL_TYPE_UNKNOWN = "FLINK_SQL_TYPE_UNKNOWN"
-# these sql will NOT involve flink job
+# === these sql will NOT involve flink job ===
 FLINK_SQL_TYPE_SET = "FLINK_SQL_TYPE_SET"
 FLINK_SQL_TYPE_USE = "FLINK_SQL_TYPE_USE"
 FLINK_SQL_TYPE_SHOW = "FLINK_SQL_TYPE_SHOW"
@@ -28,7 +28,7 @@ FLINK_SQL_TYPE_CREATE_CATALOG = "FLINK_SQL_TYPE_CREATE_CATALOG"
 FLINK_SQL_TYPE_CREATE_DATABASE = "FLINK_SQL_TYPE_CREATE_DATABASE"
 FLINK_SQL_TYPE_CREATE_VIEW = "FLINK_SQL_TYPE_CREATE_VIEW"
 FLINK_SQL_TYPE_CREATE_TABLE = "FLINK_SQL_TYPE_CREATE_TABLE"
-# these sql will involve flink job
+# === these sql will involve flink job ===
 FLINK_SQL_TYPE_CTAS = "FLINK_SQL_TYPE_CTAS"
 FLINK_SQL_TYPE_SELECT = "FLINK_SQL_TYPE_SELECT"
 FLINK_SQL_TYPE_INSERT = "FLINK_SQL_TYPE_INSERT"
@@ -46,8 +46,6 @@ _NO_JOB_REQUIRED = [
 ]
 
 logger = get_logger("FlinkSqlParseHelper")
-
-SUPPORT_DBT_HINT_KEY = ["pipeline.name" "execution.runtime-mode"]
 
 
 class FlinkSqlParseHelper:
@@ -125,7 +123,10 @@ class FlinkSqlParseHelper:
         def _process_hint_kv(multi_kv: str, _hints: dict):
             for kv in multi_kv.strip().split(" "):
                 key_value = kv.strip().split("=")
-                _hints[key_value[0]] = key_value[1]
+                key = key_value[0][1:-1]  # remove single quote '
+                if key:
+                    value = None if len(key_value) < 2 else key_value[1][1:-1]
+                    _hints[key] = value
 
         #
         sql = FlinkSqlParseHelper._sql_pre_process(sql_raw, remove_comment=False)

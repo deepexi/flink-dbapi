@@ -11,7 +11,9 @@ re_flink_hints = re.compile(
 )
 
 
-class RestClientUtils:
+class JobDetailParser:
+    """ parse job detail, to gather information check if this job is streaming"""
+
     @staticmethod
     def parse_job_detail(j: dict) -> FlinkJobDetail:
         plan = j["plan"]
@@ -35,8 +37,20 @@ class RestClientUtils:
 
             relation = Relation.from_relation_str(match_table_src_scan[2])
             jid = node["id"]
-            plan_node_status = list(filter(lambda v: v["id"] == jid, j["vertices"]))[0]["status"]
-            plan_nodes.append(PlanNode(jid, description, flink_hint, relation, plan_node_status))
+            vertex = list(filter(lambda v: v["id"] == jid, j["vertices"]))[0]
+            plan_node_status = vertex["status"]
+            metrics = vertex["metrics"]
+            metrics_accumulated_backpressured_time = metrics["accumulated-backpressured-time"]
+            metrics_accumulated_busy_time = metrics["accumulated-busy-time"]
+            if metrics_accumulated_busy_time == "NaN":
+                metrics_accumulated_busy_time = 0
+            metrics_accumulated_idle_time = metrics["accumulated-idle-time"]
+            plan_node = PlanNode(jid, description, flink_hint, relation, plan_node_status,
+                                 metrics_accumulated_backpressured_time,
+                                 metrics_accumulated_busy_time,
+                                 metrics_accumulated_idle_time
+                                 )
+            plan_nodes.append(plan_node)
 
         return FlinkJobDetail(
             j["jid"], j["name"], j["state"], j["start-time"], plan_nodes, plan["type"]

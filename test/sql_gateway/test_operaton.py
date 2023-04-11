@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 from typing import List, Any
 
-from flink_api.flink_rest.flink_rest_client import FlinkRestClient, FlinkJob
+from flink_api.flink_rest.flink_rest_client import FlinkRestClient
 from flink_api.sql_gateway.helper import SqlGatewayHelper
 from flink_api.sql_gateway.operation import SqlGatewayOperation
 from flink_api.sql_gateway.session import SqlGatewaySession
@@ -39,9 +39,7 @@ class TestSqlGatewayOperation(unittest.TestCase):
 
     def test_get_settings(self):
         session = SqlGatewaySession._test_session()
-        SqlGatewayOperation.submit_sql_and_wait_submit_finished(
-            session, "set 'execution.runtime-mode' = 'streaming'"
-        )
+        SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, "set 'execution.runtime-mode' = 'streaming'")
         settings = SqlGatewayHelper.get_settings(session)
         self.assertEquals(settings["execution.runtime-mode"], "streaming")
         pass
@@ -60,9 +58,7 @@ class TestSqlGatewayOperation(unittest.TestCase):
             ],
         )
         time.sleep(3)  # manual wait insert job finished
-        last_operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(
-            session, sql_select_cat1_db1_table01
-        )
+        last_operation = SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, sql_select_cat1_db1_table01)
         result = last_operation.fetch_all_result()
         column_names = last_operation.column_names
         self.assertEquals(sorted(column_names), sorted(["id", "name", "ts"]))
@@ -87,9 +83,7 @@ class TestSqlGatewayOperation(unittest.TestCase):
                 f"set 'pipeline.name'='{job_name}'",
             ],
         )
-        select_op1 = SqlGatewayOperation.submit_sql_and_wait_submit_finished(
-            session, sql_select_cat1_db1_topic01
-        )
+        select_op1 = SqlGatewayOperation.submit_sql_and_wait_submit_finished(session, sql_select_cat1_db1_topic01)
         while select_op1.has_next():
             select_op1.fetch_next_result()
             if len(select_op1.data_rows) >= 2:  # wait
@@ -109,5 +103,5 @@ class TestSqlGatewayOperation(unittest.TestCase):
         # clean up
         client = FlinkRestClient("127.0.0.1:8081")
         client.cancel_job_by_name_if_possible(job_name)
-        client.wait_job_complete(job_name)
+        # client.wait_job_complete(job_name)
         select_op1.close()
